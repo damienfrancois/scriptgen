@@ -1,0 +1,146 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+<script src="knockout-3.1.0.js"></script>
+<script src="scriptgen.js"></script>
+<link rel="stylesheet" href="scriptgen.css" type="text/css" />
+<title>Submision script generation wizard</title>
+</head>
+
+<body>
+<div class="container">
+
+    <div class="scriptgen container">
+        <h3>1. Describe your job</h3>
+        <div>
+            Email address: <input  placeholder="user@example.com" data-bind="value: email_address, valueUpdate: 'input'" />
+        </div>
+        <div>
+            Job name: <input placeholder="Some name" data-bind="value: job_name, valueUpdate: 'input'">
+        </div>
+        <div title=''>
+            Account: <input placeholder="Some project" data-bind="value: project, valueUpdate: 'input'">
+        </div>
+        <div title='What kind of parallelization will your job be using? For serial jobs, that do not work in parallel, do not choose any option below. If you are launching a large number of similar jobs, also named parametrized jobs, tick "Job array". If your program is parallelized with OpenMP or pthreads, or another tool that creates threads or processes that share the same memory, tick "OpenMP". If your job uses the network to transmit data, typically with OpenMPI, IntelMPI, MPICH, or any other, choose "MPI". You can combine the options.'>
+            <h5>Parallelization paradigm(s)</h5>
+            <table><tbody>
+                <tr><td style="vertical-align:top"><input id="arraytickbox" type="checkbox"  data-bind="checked: job_array" /></td><td><label for="arraytickbox"> Embarrassingly parallel / Job array</label></td></tr>
+                <tr><td style="vertical-align:top"><input id="smptickbox" type="checkbox"  data-bind="checked: job_smp" /></td><td><label for="smptickbox">  Shared memory / OpenMP </label></td></tr>
+                <tr><td style="vertical-align:top"><input id="mpitickbox" type="checkbox"  data-bind="checked: job_mpi" /></td><td><label for="mpitickbox">  Message passing / MPI</label></td></tr>
+            </tbody></table>
+        </div>
+        <div>
+            <h5>Job resources</h5>
+            <div data-bind="visible: job_array()">Number of jobs in the array:  <input type="number" class="scriptgen" data-bind="value: njobs, valueUpdate: 'input'"> </div>
+            <div data-bind="visible: true">Duration : <input type="number" class="scriptgen" data-bind="value: job_duration_days, valueUpdate: 'input'"/> day
+                                                        <span data-bind="visible: job_duration_days()!=1">s</span>,
+                                                      <input type="number" class="scriptgen" data-bind="value: job_duration_hours, valueUpdate: 'input'"/> hour
+                                                        <span data-bind="visible: job_duration_hours()!=1">s</span>, 
+                                                      <input type="number" class="scriptgen" data-bind="value: job_duration_minutes, valueUpdate: 'input'"/> minute
+                                                        <span data-bind="visible: job_duration_minutes()!=1">s</span></div> 
+            <div data-bind="visible: job_mpi()">Number of processes: <input type="number" class="scriptgen" data-bind="value: ntasks, valueUpdate: 'input'"> </div>
+            <div data-bind="visible: job_smp"> Number of threads <span data-bind="visible: job_mpi">per process</span>: 
+                                                                    <input type="number" class="scriptgen" data-bind="value: cpus_per_task, valueUpdate: 'input'"/> </div> 
+            <div data-bind="visible: true">Memory <span data-bind="visible: job_smp()"> per thread</span>
+                                                  <span data-bind="visible: job_purempi"> per process</span>: 
+                                           <input type="number" class="scriptgen" data-bind="value: mem_per_cpu_value, valueUpdate: 'input'">
+                                           <select style="width:70px" data-bind="options:byte_units,value:mem_per_cpu_unit"  ></select> </div>
+        </div> 
+        <div data-bind="visible: job_mpi">
+            Process distribution: <select title='How do you want the processes to be distributed? All on the same node to avoid network latencies? Or scattered across nodes to increase the overall memory bandwith? Or a compromise, with evenly distributed processes? Or even let the job scheduler choose, which will help your job start sooner.' data-bind="disable:partition_list()=='large',options:placement_strategy,value:process_placement"  ></select><br/>
+            <span data-bind="visible: process_placement()!='no constraint'">Number of nodes:  <input type="number" class="scriptgen" data-bind="enable:process_placement()=='evenly distributed across nodes', value: nnodes, valueUpdate: 'input'"> <br/></span>
+        </div>
+        <hr />
+        <div>
+            Total CPUs: <span data-bind="text: ncpus"></span> | 
+            Total Memory: <span data-bind="text: total_mem"></span> MB | 
+            Total CPU.Hours: <span data-bind="text: total_cpuhours"></span> 
+        </div> 
+    </div>
+
+    <!-- Cluster choice -->
+
+    <div  class="scriptgen container">
+        <h3>2. Choose a cluster</h3>
+        <table>
+            <tbody data-bind="foreach: suitable_cluster_list">
+            <tr>
+                <td style="vertical-align: top"><input type="radio" name="cluster" data-bind="attr: {value: name, id: name}, checked: $root.selected_cluster_name" /></td>
+                <td style="vertical-align: bottom"><label data-bind="text:name, attr: {for: name}"></label></td>
+            </tr>    
+            </tbody>
+            <tbody data-bind="foreach: unsuitable_cluster_list">
+            <tr>
+                <td></td>
+                <td><span data-bind="text: name"></span></a></td>
+            </tr>    
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Submission script -->
+
+    <div class="scriptgen container" data-bind="visible: suitable_cluster_list().length>0" >
+        <h3>3. Copy-paste your script</h3>
+        <div class="scriptgen code" data-bind="visible: suitable_cluster_list().length>0">
+            <div class="scriptgen code" data-bind="visible: selected_cluster().manager=='Slurm'">
+                #!/bin/bash<br/>
+                # Submission script for <span data-bind="text: selected_cluster_name"></span> <br/>
+                <span data-bind="visible: job_name().length > 1">
+                    #SBATCH --job-name=<span data-bind="text: job_name"></span><br/>
+                </span>
+                <span data-bind="visible: job_array()">
+                    #SBATCH --array=1-<span data-bind="text: njobs"></span><br/>
+                </span>
+                #SBATCH --time=<span data-bind="visible:job_duration_days()>0"><span data-bind="text: job_duration_days"></span>-</span><span data-bind="text: padded_job_duration_hours"></span>:<span data-bind="text: padded_job_duration_minutes"></span>:00 # <span data-bind="visible:job_duration_days()>0">days-</span>hh:mm:ss<br/> 
+                #<br/>
+                #SBATCH --ntasks=<span data-bind="text: ntasks"></span> <br/>
+                <span data-bind="visible: process_placement()=='scattered across distinct nodes'||process_placement()=='evenly distributed across nodes'">
+                    #SBATCH --ntasks-per-node=<span data-bind="text: tasks_per_node"></span><br/>
+                </span>
+                <span data-bind="visible: process_placement()=='all grouped on the same node'||process_placement()=='evenly distributed across nodes'">
+                    #SBATCH --nodes=<span data-bind="text: nnodes"></span><br/>
+                </span>
+                <span data-bind="visible: cpus_per_task() > 1">
+                    #SBATCH --cpus-per-task=<span data-bind="text: cpus_per_task"></span><br/>
+                </span>
+                #SBATCH --mem-per-cpu=<span data-bind="text: mem_per_cpu"></span> # <span data-bind="visible: mem_per_cpu_unit()=='MB'">megabytes</span> <span data-bind="visible: mem_per_cpu_unit()=='GB'"><span data-bind="text: mem_per_cpu_value"></span>GB</span><br/>
+                #SBATCH --partition=<span data-bind="text: partition_list"></span> <br/>
+                <span data-bind="visible: email_address().length > 1">
+                    #<br/>
+                    #SBATCH --mail-user=<span data-bind="text: email_address"></span><br/>#SBATCH --mail-type=ALL<br/>
+                </span> 
+                <span data-bind="visible: project().length > 1">
+                    #<br/>
+                    #SBATCH --comment=<span data-bind="text: project"></span>
+                </span> 
+                <br/>
+                <span data-bind="visible: job_smp()">
+                    export OMP_NUM_THREADS=<span data-bind="text: cpus_per_task"></span><br/>
+                    export MKL_NUM_THREADS=<span data-bind="text: cpus_per_task"></span><br/>
+                </span>
+                <span data-bind="visible: job_array()">
+                    echo "Task ID: $SLURM_ARRAY_TASK_ID"<br/>
+                </span>
+                <span data-bind="visible: job_filesystem()=='$GLOBALSCRATCH'">
+                    mkdir -p $GLOBALSCRATCH/$SLURM_JOB_ID<br/>
+                </span>
+                <span data-bind="visible: job_filesystem()=='$LOCALSCRATCH'">
+                    <span data-bind="visible: selected_cluster_name()!='Hercules'">
+                        mkdir -p "$LOCALSCRATCH/$SLURM_JOB_ID"<br/>
+                    </span>
+                    cp -r "$SLURM_SUBMIT_DIR/*" "$LOCALSCRATCH/$SLURM_JOB_ID"<br/>
+                    <br/>
+                </span>
+                <span data-bind="visible: job_filesystem()=='$LOCALSCRATCH'">
+                    cp -r  "$LOCALSCRATCH/$SLURM_JOB_ID/*" "$SLURM_SUBMIT_DIR/" <span data-bind="visible: selected_cluster_name()!='Hercules'">&&\<br/> rm -rf  "$LOCALSCRATCH/$SLURM_JOB_ID"</span><br/>
+                </span>
+            </div> 
+        </div>
+        </div> 
+    <script>
+ko.applyBindings(new myJobViewModel());
+    </script></p>
+</div>
