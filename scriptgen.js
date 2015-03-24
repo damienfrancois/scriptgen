@@ -43,7 +43,7 @@ var clusters = [
                 "Cluster1", // Name
                 [ 
                 new partition("defq", // Partition name,
-                              120, // Number of nodes
+                              1000, // Number of nodes
                               16, // Cores per node
                               544, // Max CPU per user
                               64*1024, // RAM per node

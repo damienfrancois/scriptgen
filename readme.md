@@ -8,9 +8,17 @@ Demo and usage
 
 Point your browser to https://rawgit.com/damienfrancois/scriptgen/master/scriptgen.html to give it a try.
 
-<IFRAME src=https://rawgit.com/damienfrancois/scriptgen/master/scriptgen.html />
+You will see a three-pane screen like this:
 
-Real live example
+![img/screenshot.png](screenshot)
+
+In the first pane, you enter the features your job needs, in terms of resources. First choose a parallelization paradigm, and the form updates accordingly. For instance, if you choose 'OpenMP', the form will read 'Number of threads' while if you choose 'MPI', you will see 'Number of processes'. Then enter the requested time, memory, and CPU resources.
+
+In the second pane, you will see a list of clusters that fit the requirements. You can then choose one. In the demo, Cluster1 has a very large number of thin nodes, while Cluster2 only has a few fat nodes so depending on the number of CPUs per node, or the memory per process, or the number of CPUs, either one can be disabled. 
+
+In the third pane, you get a submission script that you can copy/paste.
+
+For a real-life example, head to <http://www.ceci-hpc.be/scriptgen.html>
 
 Installation and Setup
 ----------------------
