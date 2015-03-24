@@ -6,7 +6,7 @@ Scriptgen is an interactive wizard that allows users of a supercomputer writing 
 Demo and usage
 --------------
 
-Point your browser to https://rawgit.com/damienfrancois/scriptgen/master/scriptgen.html to give it a try.
+Point your browser [here](https://rawgit.com/damienfrancois/scriptgen/master/scriptgen.html) to give it a try.
 
 You will see a three-pane screen like this:
 
