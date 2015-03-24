@@ -23,10 +23,11 @@ For a real-life example, head to <http://www.ceci-hpc.be/scriptgen.html>
 Installation and Setup
 ----------------------
 
-designed for multi-cluster sites
-changes are reflected directly so the user sees the impact of its request
+To test it, you can simply download the zip file and unzip. It does not require a webserver to run as it is all client-side. 
+
+To use it for real, you will need to modify the javascript source file to hardcode the features each of your clusters can offer (Follow the example and the comments in there.) 
 
 Disclaimer
 ----------
 
-This is a small project I started just to learn a bit of javascript and knockout.js so the code does probabAly not comply to best practices. It needs major refactoring and reviewing, but it can be used as is. It was designed with Slurm as a resource manager in mind, (and adapted later for other resource managers) so the vocabulary is very Slurm-related.
+This is a small project I started just to learn a bit of javascript and knockout.js so the code does probably not comply to best practices. It needs major refactoring and reviewing, but it can be used as is. It was designed with Slurm as a resource manager in mind, (and adapted later for other resource managers) so the vocabulary is very Slurm-related.
