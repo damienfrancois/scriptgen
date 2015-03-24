@@ -10,7 +10,7 @@ Point your browser to https://rawgit.com/damienfrancois/scriptgen/master/scriptg
 
 You will see a three-pane screen like this:
 
-![img/screenshot.png](screenshot)
+![https://github.com/damienfrancois/scriptgen/blob/master/img/screenshot.png](screenshot)
 
 In the first pane, you enter the features your job needs, in terms of resources. First choose a parallelization paradigm, and the form updates accordingly. For instance, if you choose 'OpenMP', the form will read 'Number of threads' while if you choose 'MPI', you will see 'Number of processes'. Then enter the requested time, memory, and CPU resources.
 
